@@ -163,11 +163,7 @@ function prepareImportedScene(root) {
     object.frustumCulled = true;
     const bounds = new THREE.Box3().setFromObject(object);
     const dimensions = bounds.getSize(new THREE.Vector3());
-    if (dimensions.length() > 55) {
-      const mats = Array.isArray(object.material) ? object.material : [object.material];
-      for (const mat of mats) if (mat) mat.side = THREE.BackSide;
-    }
-    if (object.name.includes('dark inner digital sphere')) object.visible = false;
+    if (object.name.includes('dark inner digital sphere') || object.name.includes('vast spherical enclosure')) object.visible = false;
     if (/orbiting interface fragment|floating data shard|luminous data node|Network node/i.test(object.name)) {
       const longestSide = Math.max(dimensions.x, dimensions.y, dimensions.z, 0.001);
       const scaleBoost = Math.min(20, 4.2 / longestSide);
