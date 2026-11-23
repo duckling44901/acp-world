@@ -17,7 +17,7 @@ const toast = document.querySelector('#toast');
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color('#f4f5f2');
-const camera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 0.06, 180);
+const camera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 0.06, 4200);
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
 renderer.setSize(innerWidth, innerHeight);
@@ -101,7 +101,6 @@ const cameraTarget = new THREE.Vector3();
 const logoPivot = { object: null };
 const animatedRings = [];
 const orbitPivots = [];
-const orbitalGuides = [];
 
 function fitAvatar(model) {
   const box = new THREE.Box3().setFromObject(model);
@@ -158,7 +157,7 @@ function prepareImportedScene(root) {
   const orbitCandidates = [];
   root.traverse((object) => {
     if (object.name.includes('central rotating emblem controller')) logoPivot.object = object;
-    if (object.name.includes('rotating halo') || object.name.includes('tilted orbit ring')) animatedRings.push(object);
+    if (object.name.includes('rotating halo') || object.name.includes('tilted orbit ring') || object.name.includes('giant orbital rail')) animatedRings.push(object);
     if (!object.isMesh) return;
     object.frustumCulled = true;
     const bounds = new THREE.Box3().setFromObject(object);
@@ -175,8 +174,6 @@ function prepareImportedScene(root) {
   if (!logoPivot.object) return;
   root.updateMatrixWorld(true);
   const center = logoPivot.object.getWorldPosition(new THREE.Vector3());
-  logoPivot.object.scale.multiplyScalar(2.2);
-
   const orbitGroups = [
     { speed: 0.018, names: /Network node|luminous data node/i },
     { speed: -0.012, names: /orbiting interface fragment|floating data shard/i },
@@ -191,18 +188,6 @@ function prepareImportedScene(root) {
     orbitPivots.push({ object: pivot, speed });
   });
 
-  [15, 23, 31].forEach((radius, index) => {
-    const orbit = new THREE.Group();
-    orbit.position.copy(center);
-    const ring = new THREE.Mesh(
-      new THREE.TorusGeometry(radius, index === 0 ? 0.035 : 0.022, 8, 180),
-      new THREE.MeshBasicMaterial({ color: index === 1 ? 0x81b9bd : 0xd5a2bf, transparent: true, opacity: 0.24 })
-    );
-    ring.rotation.x = Math.PI / 2 + (index - 1) * 0.16;
-    orbit.add(ring);
-    root.add(orbit);
-    orbitalGuides.push({ object: orbit, speed: index === 1 ? -0.025 : 0.016 });
-  });
 }
 
 async function loadWorlds() {
@@ -225,8 +210,8 @@ function enterWorld() {
     activeZone = 'world';
     portalRoot.visible = false;
     worldRoot.visible = true;
-    player.position.set(0, 2.45, -6.5);
-    yaw = 0;
+    player.position.set(0, 27, -180);
+    yaw = Math.PI;
     pitch = 0;
     updateZoneLabels();
     introCard.classList.add('dismissed');
@@ -294,7 +279,7 @@ function update(dt, elapsed) {
     if (keys.has('KeyC') || keys.has('ControlLeft') || keys.has('ControlRight')) movement.y -= 1;
     if (movement.lengthSq() > 0) {
       const boost = keys.has('ShiftLeft') || keys.has('ShiftRight') ? 2.8 : 1;
-      movement.normalize().multiplyScalar((activeZone === 'portal' ? 7.1 : 9.2) * boost * dt);
+      movement.normalize().multiplyScalar((activeZone === 'portal' ? 7.1 : 40) * boost * dt);
       player.position.add(movement);
     }
 
@@ -307,9 +292,9 @@ function update(dt, elapsed) {
       if (player.position.z < 0.2 && inKeyhole) enterWorld();
       if (player.position.z < 0.2 && !inKeyhole) player.position.z = 0.2;
     } else {
-      player.position.x = THREE.MathUtils.clamp(player.position.x, -52, 52);
-      player.position.y = THREE.MathUtils.clamp(player.position.y, -26, 35);
-      player.position.z = THREE.MathUtils.clamp(player.position.z, -61, 30);
+      player.position.x = THREE.MathUtils.clamp(player.position.x, -1300, 1300);
+      player.position.y = THREE.MathUtils.clamp(player.position.y, -1350, 1350);
+      player.position.z = THREE.MathUtils.clamp(player.position.z, -1300, 1300);
     }
     updateHud();
   }
@@ -322,7 +307,6 @@ function update(dt, elapsed) {
   });
   if (activeZone === 'world') {
     orbitPivots.forEach(({ object, speed }) => { object.rotation.y += dt * speed; });
-    orbitalGuides.forEach(({ object, speed }) => { object.rotation.y += dt * speed; });
   }
   if (activeZone === 'world') {
     fillLight.position.set(Math.sin(elapsed * 0.17) * 18, 7 + Math.cos(elapsed * 0.13) * 6, -24 + Math.cos(elapsed * 0.15) * 13);
