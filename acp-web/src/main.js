@@ -16,7 +16,7 @@ const avatarStatus = document.querySelector('#avatarStatus');
 const toast = document.querySelector('#toast');
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color('#070a12');
+scene.background = new THREE.Color('#f4f5f2');
 const camera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 0.06, 180);
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
@@ -24,16 +24,16 @@ renderer.setSize(innerWidth, innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.22;
-renderer.setClearColor('#070a12');
+renderer.setClearColor('#f4f5f2');
 
-scene.add(new THREE.HemisphereLight(0xd9f7ff, 0x252242, 1.65));
-const keyLight = new THREE.DirectionalLight(0xe7fbff, 2.2);
+scene.add(new THREE.HemisphereLight(0xffffff, 0xb7c5c2, 2.15));
+const keyLight = new THREE.DirectionalLight(0xffffff, 2.8);
 keyLight.position.set(-7, 15, 8);
 scene.add(keyLight);
-const fillLight = new THREE.PointLight(0x5f83ff, 240, 85, 2);
+const fillLight = new THREE.PointLight(0x85c9d1, 120, 100, 2);
 fillLight.position.set(4, 4, -23);
 scene.add(fillLight);
-const rimLight = new THREE.PointLight(0x71eff0, 150, 70, 2);
+const rimLight = new THREE.PointLight(0xe7b6d1, 90, 90, 2);
 rimLight.position.set(-12, -2, -8);
 scene.add(rimLight);
 
@@ -50,6 +50,7 @@ player.add(avatarAnchor);
 
 // A quiet stand-in keeps the flight link visible until a personal GLB is supplied.
 const proxy = new THREE.Group();
+proxy.scale.setScalar(0.58);
 const proxyMat = new THREE.MeshStandardMaterial({ color: 0x8de7e6, emissive: 0x42b8c8, emissiveIntensity: 0.48, roughness: 0.33, metalness: 0.25 });
 const proxyDark = new THREE.MeshStandardMaterial({ color: 0x19243b, emissive: 0x182b50, emissiveIntensity: 0.32, roughness: 0.4, metalness: 0.35 });
 const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.26, 0.48, 5, 10), proxyMat);
@@ -99,13 +100,15 @@ const cameraOffset = new THREE.Vector3();
 const cameraTarget = new THREE.Vector3();
 const logoPivot = { object: null };
 const animatedRings = [];
+const orbitPivots = [];
+const orbitalGuides = [];
 
 function fitAvatar(model) {
   const box = new THREE.Box3().setFromObject(model);
   const size = new THREE.Vector3();
   box.getSize(size);
   const height = Math.max(size.y, 0.01);
-  const scale = 1.62 / height;
+  const scale = 0.92 / height;
   model.scale.setScalar(scale);
   const fitted = new THREE.Box3().setFromObject(model);
   model.position.y -= fitted.min.y;
@@ -152,7 +155,10 @@ async function loadAvatarFile(file) {
 }
 
 function prepareImportedScene(root) {
+  const orbitCandidates = [];
   root.traverse((object) => {
+    if (object.name.includes('central rotating emblem controller')) logoPivot.object = object;
+    if (object.name.includes('rotating halo') || object.name.includes('tilted orbit ring')) animatedRings.push(object);
     if (!object.isMesh) return;
     object.frustumCulled = true;
     const bounds = new THREE.Box3().setFromObject(object);
@@ -161,8 +167,45 @@ function prepareImportedScene(root) {
       const mats = Array.isArray(object.material) ? object.material : [object.material];
       for (const mat of mats) if (mat) mat.side = THREE.BackSide;
     }
-    if (object.name.includes('central rotating emblem controller')) logoPivot.object = object;
-    if (object.name.includes('rotating halo') || object.name.includes('tilted orbit ring')) animatedRings.push(object);
+    if (object.name.includes('dark inner digital sphere')) object.visible = false;
+    if (/orbiting interface fragment|floating data shard|luminous data node|Network node/i.test(object.name)) {
+      const longestSide = Math.max(dimensions.x, dimensions.y, dimensions.z, 0.001);
+      const scaleBoost = Math.min(20, 4.2 / longestSide);
+      object.scale.multiplyScalar(scaleBoost);
+      orbitCandidates.push(object);
+    }
+  });
+
+  if (!logoPivot.object) return;
+  root.updateMatrixWorld(true);
+  const center = logoPivot.object.getWorldPosition(new THREE.Vector3());
+  logoPivot.object.scale.multiplyScalar(2.2);
+
+  const orbitGroups = [
+    { speed: 0.018, names: /Network node|luminous data node/i },
+    { speed: -0.012, names: /orbiting interface fragment|floating data shard/i },
+  ];
+  orbitGroups.forEach(({ speed, names }) => {
+    const pivot = new THREE.Group();
+    pivot.position.copy(center);
+    root.add(pivot);
+    for (const object of orbitCandidates) {
+      if (names.test(object.name) && object.parent !== pivot) pivot.attach(object);
+    }
+    orbitPivots.push({ object: pivot, speed });
+  });
+
+  [15, 23, 31].forEach((radius, index) => {
+    const orbit = new THREE.Group();
+    orbit.position.copy(center);
+    const ring = new THREE.Mesh(
+      new THREE.TorusGeometry(radius, index === 0 ? 0.035 : 0.022, 8, 180),
+      new THREE.MeshBasicMaterial({ color: index === 1 ? 0x81b9bd : 0xd5a2bf, transparent: true, opacity: 0.24 })
+    );
+    ring.rotation.x = Math.PI / 2 + (index - 1) * 0.16;
+    orbit.add(ring);
+    root.add(orbit);
+    orbitalGuides.push({ object: orbit, speed: index === 1 ? -0.025 : 0.016 });
   });
 }
 
@@ -281,6 +324,10 @@ function update(dt, elapsed) {
   animatedRings.forEach((ring, index) => {
     if (activeZone === 'world') ring.rotation.y += dt * (index === 0 ? 0.22 : -0.16);
   });
+  if (activeZone === 'world') {
+    orbitPivots.forEach(({ object, speed }) => { object.rotation.y += dt * speed; });
+    orbitalGuides.forEach(({ object, speed }) => { object.rotation.y += dt * speed; });
+  }
   if (activeZone === 'world') {
     fillLight.position.set(Math.sin(elapsed * 0.17) * 18, 7 + Math.cos(elapsed * 0.13) * 6, -24 + Math.cos(elapsed * 0.15) * 13);
   }

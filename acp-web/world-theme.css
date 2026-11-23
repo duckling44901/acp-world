@@ -1,0 +1,43 @@
+:root {
+  color-scheme: light;
+  --ink: #172431;
+  --muted: #687580;
+  --line: rgba(29, 49, 61, .16);
+  --cyan: #267f85;
+  --pink: #bb6f98;
+  --night: #f4f5f2;
+}
+
+body { background: #f4f5f2; color: var(--ink); }
+.grain { opacity: .055; mix-blend-mode: multiply; }
+.topbar { border-color: rgba(29,49,61,.11); background: linear-gradient(180deg,rgba(247,248,246,.82),transparent); }
+.wordmark, button { color: var(--ink); }
+.mark { border-color: rgba(38,127,133,.55); color: var(--cyan); }
+.wordmark-light, #zoneCaption, .eyebrow, .intro-copy, .avatar-note, .intro-foot,
+.controls-legend, .legend-label, .help-button, .center-message { color: #52616d; }
+.zone-readout { color: #273946; }
+.zone-divider { color: rgba(29,49,61,.35); }
+.icon-button, .upload-button { color: #293b47; border-color: rgba(29,49,61,.2); background: rgba(255,255,255,.46); }
+.upload-plus, .note-orbit, .help-button span { color: var(--cyan); }
+.intro-copy { color: #52616d; }
+.intro-foot, .bottom-bar { border-color: rgba(29,49,61,.14); }
+.intro-foot, .legend-label { color: #66747f; }
+.bottom-bar { background: linear-gradient(0deg,rgba(247,248,246,.82),transparent); }
+kbd { color: #334651; border-color: rgba(29,49,61,.24); background: rgba(255,255,255,.55); }
+.primary-button { background: #c8ece5; color: #142c33; }
+.studio-link { position: absolute; right: 9.5vw; top: 50%; transform: translateY(-50%); color: #253c45; text-decoration: none; font-size: 11px; font-weight: 700; letter-spacing: .04em; }
+.studio-link:hover { color: var(--cyan); }
+.hud { color: #f7f8f5; background: rgba(18,31,39,.82); border-color: rgba(255,255,255,.2); }
+.hud-coordinate b { color: #f0f5f3; }
+.help-panel, .toast { color: #f5f7f5; background: rgba(18,31,39,.94); }
+.center-message { color: #263943; background: rgba(255,255,255,.72); border-color: rgba(29,49,61,.15); }
+.gate-hint { color: #293c46; background: rgba(255,255,255,.9); }
+.loading-screen { background: #f4f5f2; }
+.loading-title { color: #243840; }
+.transition-screen { background: rgba(245,247,245,.95); }
+.transition-label { color: #287b80; }
+
+@media (max-width: 720px) {
+  .studio-link { right: 18vw; font-size: 10px; }
+  .zone-readout { display: none; }
+}

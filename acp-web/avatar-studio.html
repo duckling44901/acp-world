@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f2f6f2" />
+    <title>아바타 제작실 — ACP World</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./avatar-studio.css" />
+    <script type="importmap">
+      {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.183.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.183.0/examples/jsm/"}}
+    </script>
+  </head>
+  <body>
+    <div class="studio-shell">
+      <header class="studio-header">
+        <a class="brand" href="./index.html"><span class="brand-mark">A</span><span>ACP <b>WORLD</b></span></a>
+        <div class="header-meta"><span class="live-dot"></span> OZ AVATAR LAB <span class="meta-divider">/</span> <a href="./index.html">공간으로 돌아가기 ↗</a></div>
+      </header>
+
+      <main class="studio-grid">
+        <section class="preview-column" aria-label="아바타 미리보기">
+          <div class="preview-copy"><p class="eyebrow">YOUR SECOND SELF</p><h1>오즈에 어울리는<br /><em>나만의 아바타.</em></h1><p>이름을 짓고, 색을 고르고, 반짝이는 새 몸을 만들어 보세요.</p></div>
+          <div class="stage-wrap">
+            <canvas id="avatarCanvas" aria-label="3D 아바타 미리보기"></canvas>
+            <div class="stage-label"><span>PREVIEW / 01</span><span>드래그해서 돌려보기</span></div>
+            <div class="stage-orbit orbit-one"></div><div class="stage-orbit orbit-two"></div>
+          </div>
+          <div class="preview-footer"><span>SMOOTH · GLOSSY · YOURS</span><span id="previewName">MY OZ AVATAR</span></div>
+        </section>
+
+        <section class="editor-column" aria-label="아바타 설정">
+          <div class="editor-heading"><div><p class="eyebrow">01 / CREATE</p><h2>아바타 만들기</h2></div><span class="step-badge">CUSTOMIZE</span></div>
+
+          <label class="field-label" for="avatarName">이름</label>
+          <input id="avatarName" class="text-input" maxlength="24" placeholder="예: 구름 위의 모모" value="모모" />
+
+          <div class="section-label"><span>아바타 종류</span><span class="section-note">마음에 드는 몸을 골라요</span></div>
+          <div class="species-grid" id="speciesGrid">
+            <button class="species-choice selected" data-species="bunny"><span>🐰</span><b>토끼</b></button>
+            <button class="species-choice" data-species="cat"><span>🐱</span><b>고양이</b></button>
+            <button class="species-choice" data-species="fox"><span>🦊</span><b>여우</b></button>
+            <button class="species-choice" data-species="bear"><span>🐻</span><b>곰</b></button>
+            <button class="species-choice" data-species="bird"><span>🐤</span><b>새</b></button>
+            <button class="species-choice" data-species="robot"><span>🤖</span><b>로봇</b></button>
+          </div>
+
+          <div class="section-label"><span>몸의 색</span><span class="section-note">원하는 색을 직접 고를 수도 있어요</span></div>
+          <div class="color-row"><div class="swatches" id="swatches">
+            <button class="swatch selected" style="--swatch:#9bded1" data-color="#9bded1" aria-label="민트"></button>
+            <button class="swatch" style="--swatch:#f4a6b9" data-color="#f4a6b9" aria-label="핑크"></button>
+            <button class="swatch" style="--swatch:#ffc875" data-color="#ffc875" aria-label="살구"></button>
+            <button class="swatch" style="--swatch:#9bb9f3" data-color="#9bb9f3" aria-label="하늘"></button>
+            <button class="swatch" style="--swatch:#c2a5e8" data-color="#c2a5e8" aria-label="라벤더"></button>
+            <button class="swatch" style="--swatch:#d8d6c8" data-color="#d8d6c8" aria-label="크림"></button>
+          </div><label class="custom-color" title="직접 색 고르기"><input id="bodyColor" type="color" value="#9bded1" /><span>＋</span></label></div>
+
+          <div class="two-fields">
+            <label><span class="field-label">눈 색</span><input id="eyeColor" class="color-input" type="color" value="#283f67" /></label>
+            <label><span class="field-label">포인트 색</span><input id="accentColor" class="color-input" type="color" value="#f49ab5" /></label>
+          </div>
+
+          <div class="section-label"><span>마지막 장식</span><span class="section-note">언제든 바꿀 수 있어요</span></div>
+          <div class="accessory-row" id="accessoryRow">
+            <button class="accessory-choice selected" data-accessory="none">없음</button>
+            <button class="accessory-choice" data-accessory="halo">후광</button>
+            <button class="accessory-choice" data-accessory="scarf">목도리</button>
+            <button class="accessory-choice" data-accessory="wings">날개</button>
+          </div>
+
+          <div class="section-label size-label"><span>머리 비율</span><span id="headSizeValue" class="section-note">보통</span></div>
+          <input id="headSize" class="range-input" type="range" min="0.82" max="1.28" step="0.01" value="1" />
+
+          <div class="action-row">
+            <button id="saveButton" class="primary-action">아바타 저장 <span>↗</span></button>
+            <button id="exportButton" class="secondary-action">GLB 내려받기</button>
+          </div>
+          <div class="key-card"><div class="key-card-copy"><span class="key-icon">⌘</span><div><b>내 아바타 키</b><small>키를 입력하면 이 기기에 저장한 모습을 불러와요.</small></div></div><div class="key-row"><input id="loginKey" maxlength="14" placeholder="OZ-AB12-CD34" aria-label="아바타 키 입력" /><button id="loadKeyButton">불러오기</button></div><div id="currentKey" class="current-key hidden"></div></div>
+          <div class="saved-section"><div class="saved-heading"><span>내가 만든 아바타</span><span id="savedCount">0</span></div><div id="savedList" class="saved-list"></div></div>
+          <p id="toast" class="studio-toast" role="status"></p>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="./src/avatar-studio.js"></script>
+  </body>
+</html>
