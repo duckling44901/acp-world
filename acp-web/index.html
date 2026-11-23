@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#060912" />
+    <title>ACP World — 열쇠 너머의 세계</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main id="app">
+      <canvas id="world" aria-label="ACP World 3D 탐험 화면"></canvas>
+      <div class="grain" aria-hidden="true"></div>
+
+      <header class="topbar">
+        <a class="wordmark" href="#" aria-label="ACP World 홈"><span class="mark">A</span><span>ACP<span class="wordmark-light"> WORLD</span></span></a>
+        <div class="zone-readout"><span class="signal-dot"></span><span id="zoneName">DIGITAL SPACE</span><span class="zone-divider">/</span><span id="zoneCaption">THE KEY IS A PORTAL</span></div>
+        <button id="soundButton" class="icon-button" aria-label="사운드 켜기" title="사운드 켜기"><span class="sound-icon">◖</span></button>
+      </header>
+
+      <section class="intro-card" id="introCard">
+        <p class="eyebrow"><span class="eyebrow-line"></span> A WORLD BETWEEN WORLDS</p>
+        <h1>열쇠 너머,<br /><em>ACP</em>의 세계로.</h1>
+        <p class="intro-copy">하얀 공간을 가로질러 열쇠 구멍을 통과해 보세요.<br />그 너머에는 끝없이 유영할 수 있는 ACP World가 펼쳐집니다.</p>
+        <div class="intro-actions">
+          <button id="startButton" class="primary-button"><span>세계에 들어가기</span><span class="button-arrow">↗</span></button>
+          <label class="upload-button" for="avatarInput"><span class="upload-plus">＋</span>아바타 불러오기</label>
+          <input id="avatarInput" type="file" accept=".glb,model/gltf-binary" hidden />
+        </div>
+        <div class="avatar-note"><span class="note-orbit">◎</span><span id="avatarStatus">내 아바타가 아직 없어요. 나중에 GLB 파일을 불러올 수 있어요.</span></div>
+        <div class="intro-foot"><span>ACP SPACE / 01</span><span>SCROLL LESS. FLY MORE.</span></div>
+      </section>
+
+      <aside class="hud hidden" id="hud">
+        <div class="hud-top"><span class="hud-kicker">FLIGHT LINK</span><span class="hud-live"><i></i> CONNECTED</span></div>
+        <div class="hud-avatar"><div class="avatar-glyph" id="avatarGlyph"><span></span></div><div><strong id="hudAvatarName">WAYFINDER</strong><small id="hudAvatarType">TEMPORARY BODY</small></div></div>
+        <div class="hud-rule"></div>
+        <div class="hud-coordinate"><span>POSITION</span><b id="coordinates">00.0 <i>/</i> 00.0 <i>/</i> 00.0</b></div>
+        <div class="hud-coordinate"><span>SECTOR</span><b id="sector">GATE 01</b></div>
+        <button class="quiet-button" id="portalReturn">↶ <span>열쇠 공간으로</span></button>
+      </aside>
+
+      <div id="crosshair" class="crosshair hidden"><span></span><span></span></div>
+      <div class="center-message" id="centerMessage"><span id="messageLine">열쇠 구멍을 통과하면 ACP World가 열립니다</span></div>
+      <div id="gateHint" class="gate-hint hidden"><span class="keyhole-mini">●<i></i></span><span>열쇠를 향해 날아가세요</span><b>W</b><b>A</b><b>S</b><b>D</b></div>
+
+      <footer class="bottom-bar">
+        <div class="controls-legend"><span class="legend-label">FLIGHT CONTROLS</span><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 이동</span><span><kbd>SPACE</kbd><kbd>C</kbd> 상승 / 하강</span><span><kbd>SHIFT</kbd> 가속</span><span><kbd>MOUSE</kbd> 시선</span></div>
+        <button id="helpButton" class="help-button"><span>?</span> 조작 안내</button>
+      </footer>
+
+      <div id="loading" class="loading-screen"><div class="loading-mark">A</div><div class="loading-title">BUILDING YOUR WORLD</div><div class="loading-track"><i></i></div><div class="loading-sub">공간을 준비하고 있어요</div></div>
+      <div id="transition" class="transition-screen"><div class="transition-ring"></div><div class="transition-label">CROSSING THE KEYHOLE</div></div>
+      <div id="helpPanel" class="help-panel hidden"><button id="closeHelp" aria-label="닫기">×</button><p class="eyebrow">HOW TO MOVE</p><h2>공간을 자유롭게 날아보세요.</h2><div class="help-grid"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span><b>앞뒤좌우 이동</b><span><kbd>SPACE</kbd> / <kbd>C</kbd></span><b>위아래로 유영</b><span><kbd>SHIFT</kbd></span><b>빠르게 이동</b><span><kbd>MOUSE</kbd></span><b>시선과 방향 조절</b></div><p class="help-tip">열쇠의 둥근 머리 부분을 향해 날아가면 ACP World로 이어집니다.</p></div>
+      <div id="toast" class="toast" role="status"></div>
+    </main>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
